@@ -4,7 +4,7 @@ interface stackEL {
 }
 interface genHonoiTower<T>{
     items: T [];
-   stackId:number;
+   stackId:string;
    push(item:T):void;
    pop(): T | undefined ;
    peek(): T | undefined;
@@ -20,13 +20,13 @@ interface  game{
   init(StackA:HonoiTower, StackB:HonoiTower, StackC:HonoiTower, container:Element):void
   rerender(elem:HonoiTower):void;
   steps(Stack_1:HonoiTower,Stack_2:HonoiTower):void;
-  resolve():void;
+  resolve( diskCount:number,  StackA: HonoiTower, StackB: HonoiTower, StackC: HonoiTower):void;
 } 
 class HonoiTower implements genHonoiTower<stackEL> {
    items: stackEL [];
-  stackId: number;
+  stackId: string;
  
-  constructor(id:number) {
+  constructor(id:string) {
     this.stackId=id;
     this.items = [];
     }
@@ -55,13 +55,13 @@ class HonoiTower implements genHonoiTower<stackEL> {
    }
    genElement(elem:stackEL):Element{
      const newDisk =  document.createElement("li");
-     if (elem.type == 3) {
+     if (elem.type == 1) {
       newDisk.classList.add("first");
     }
      if (elem.type ==2) {
             newDisk.classList.add("second");
       } 
-      if (elem.type == 1) {
+      if (elem.type == 3) {
         newDisk.classList.add("last");
     } 
     newDisk.innerText=elem.title;
@@ -89,7 +89,7 @@ class Game   implements game{
   private StackA: HonoiTower;
   private StackB: HonoiTower;
   private StackC: HonoiTower;
-  private diskCount:number|null;
+  private diskCount:number;
   constructor( StackA: HonoiTower, StackB: HonoiTower, StackC: HonoiTower, container: Element|null, diskCount:conter) {
     this.StackA = StackA
     this.StackB = StackB
@@ -109,17 +109,19 @@ class Game   implements game{
       alert("not faind stack! ")
     }
   }
-  stepscounter (countDisk:number):|void{
-    console.log(countDisk*2+1);
+  stepscounter ():number{
+   return this.diskCount*2+1;
   }
   init(): void {
-    this.StackA.push({title:"1",type:1});
-    this.StackA.push({title:"2",type:2});
-    this.StackA.push({title: "3",type:3});
+      for (let index = this.diskCount; index != 0; index--) {
+        this.StackA.push({title:`${index}`,type:index})
+      }
     if (container!=null) {
       this.StackA.render(container);
       this.StackB.render(container);
       this.StackC.render(container);
+      console.log( this.StackA);
+      
           setTimeout(() => {
             alert("init done");
           }, 600);
@@ -134,47 +136,36 @@ class Game   implements game{
     this.rerender(Stack_1);
     this.rerender(Stack_2);
   }
-  resolve(){
-    alert("resolve start");
-    alert("step1");
-    this.steps(this.StackA,this.StackB);
-  setTimeout(() => {
-    alert("step2");
-    this.steps(this.StackA,this.StackC);
-  }, 600);
-  setTimeout(() => {
-    alert("step3");
-    this.steps(this.StackB,this.StackC);
-  },600);
-  setTimeout(() => {
-    alert("step4");
-    this.steps(this.StackA,this.StackB);
-  },600); 
-  setTimeout(() => {
-    alert("step5");
-    this.steps(this.StackC,this.StackA);
-  },600);
+ 
+  resolve(diskCount:number,  Start: HonoiTower, Goal: HonoiTower, Additinal: HonoiTower,){
+  // debugger;
+    if (diskCount>0) {
+    this.resolve(diskCount-1 , Start, Additinal, Goal)
+   setTimeout(() => {
+    alert("step");
+    this.steps(Start,Goal);
+   }, 600);
 
-  setTimeout(() => {
-    alert("step6");
-    this.steps(this.StackC,this.StackB);
-  },600);
-  setTimeout(() => {
-    alert("step7");
-    this.steps(this.StackA,this.StackB);
-  },600);
+   
+    console.log(`disk ${diskCount} move from  ${Start.getID()} to ${Goal.getID()}`);
+    this.resolve(diskCount-1 ,Additinal,Goal, Start)
+  }
+  return;
+    
+
 }
 }
 
 const container = document.getElementById("app");
 
-const StackA= new HonoiTower(1);
-const StackB = new HonoiTower(2);
-const StackC = new HonoiTower(3);
-const MyGmae = new Game(StackA,StackB,StackC,container,3);
+const StackA= new HonoiTower("a");
+const StackB = new HonoiTower("b");
+const StackC = new HonoiTower("c");
+const MyGmae = new Game(StackA,StackB,StackC,container,8);
 MyGmae.init();
 setTimeout(() => {
-  MyGmae.resolve();
+  MyGmae.resolve(8,StackA,StackB,StackC);
+
 }, 1200);
 
 
