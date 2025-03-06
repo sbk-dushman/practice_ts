@@ -54,16 +54,33 @@ class HonoiTower implements genHonoiTower<stackEL> {
     this.items = [];
    }
    genElement(elem:stackEL):Element{
+    const colors= [
+      '#7e7e7e',
+      '#FFFF00',
+      '#fb8ed7',
+      '#0080FF',
+      '#00FF00',
+      '#7ffff0',
+      '#FF8000',
+      '#FF0000',
+    ]
+    
      const newDisk =  document.createElement("li");
-     if (elem.type == 1) {
-      newDisk.classList.add("first");
+
+     if (elem.type === 1) {
+      
+      let padding  =  20* elem.type; 
+      newDisk.style.paddingLeft =`${padding}px`;
+      newDisk.style.paddingRight =`${padding}px`;
     }
-     if (elem.type ==2) {
-            newDisk.classList.add("second");
-      } 
-      if (elem.type == 3) {
-        newDisk.classList.add("last");
-    } 
+    if (elem.type > 1) {
+
+      let padding  =  20* elem.type; 
+      newDisk.style.paddingLeft =`${padding}px`;
+      newDisk.style.paddingRight =`${padding}px`;
+    }
+   
+    newDisk.style.background= colors[elem.type-1]
     newDisk.innerText=elem.title;
       return newDisk;
    }
@@ -161,10 +178,10 @@ const container = document.getElementById("app");
 const StackA= new HonoiTower("a");
 const StackB = new HonoiTower("b");
 const StackC = new HonoiTower("c");
-const MyGmae = new Game(StackA,StackB,StackC,container,8);
+const MyGmae = new Game(StackA,StackB,StackC,container,5);
 MyGmae.init();
 setTimeout(() => {
-  MyGmae.resolve(8,StackA,StackB,StackC);
+  MyGmae.resolve(5,StackA,StackB,StackC);
 
 }, 1200);
 
